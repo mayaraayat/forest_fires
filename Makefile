@@ -19,7 +19,7 @@ precommit:
 	pre-commit run --all-files
 
 docs-serve:
-	uv run mkdocs serve -a 0.0.0.0:8000
+	uv run mkdocs serve
 
 docs-build:
 	uv run mkdocs build
