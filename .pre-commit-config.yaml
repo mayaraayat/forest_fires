@@ -1,0 +1,74 @@
+minimum_pre_commit_version: "3.0.0"
+default_language_version:
+  python: python3.10
+default_stages: [pre-commit]
+exclude: "^(notebooks/|.*\\.pb2\\.py$|.*_pb2\\.py$)"
+fail_fast: false
+
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: check-ast
+      - id: check-merge-conflict
+      - id: check-yaml
+        args: ["--unsafe"]
+      - id: check-toml
+      - id: check-json
+      - id: detect-private-key
+      - id: check-case-conflict
+      - id: check-added-large-files
+        args: ["--maxkb=1000"]
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+      - id: mixed-line-ending
+      - id: debug-statements
+      - id: check-builtin-literals
+      - id: check-docstring-first
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.8.4
+    hooks:
+      - id: ruff
+        types_or: [python, pyi, jupyter]
+        args: ["--fix", "--exit-non-zero-on-fix", "--cache-dir=.ruff_cache"]
+      - id: ruff-format
+        types_or: [python, pyi, jupyter]
+        args: ["--cache-dir=.ruff_cache"]
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.8.4
+    hooks:
+      - id: ruff
+        name: ruff-unsafe
+        args: ["--fix", "--unsafe-fixes", "--exit-non-zero-on-fix", "--cache-dir=.ruff_cache"]
+        stages: [manual]
+        types_or: [python, pyi, jupyter]
+
+  - repo: local
+    hooks:
+      - id: mypy
+        exclude: "^notebooks/"
+        name: mypy
+        entry: "sh build/hook_mypy_run.sh"
+        language: system
+        types: [python]
+        require_serial: true
+        pass_filenames: true
+
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: requirements-txt-fixer
+        files: requirements.*\\.txt$
+
+  - repo: https://github.com/compilerla/conventional-pre-commit
+    rev: v3.6.0
+    hooks:
+      - id: conventional-pre-commit
+        stages: [commit-msg]
+
+  - repo: https://github.com/astral-sh/uv-pre-commit
+    rev: 0.8.4
+    hooks:
+      - id: uv-lock
