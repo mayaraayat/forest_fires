@@ -1,0 +1,18 @@
+site_name: forest_fires
+theme:
+  name: material
+  features:
+    - navigation.expand
+    - navigation.sections
+    - toc.integrate
+plugins:
+  - mkdocstrings:
+      handlers:
+        python:
+          options:
+            show_source: true
+repo_url: https://github.com/mayaraayat/forest_fires
+repo_name: GitHub
+nav:
+  - Home: index.md
+  - API Reference: api.md
