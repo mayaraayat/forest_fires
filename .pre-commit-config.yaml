@@ -45,17 +45,6 @@ repos:
         stages: [manual]
         types_or: [python, pyi, jupyter]
 
-  - repo: local
-    hooks:
-      - id: mypy
-        exclude: "^notebooks/"
-        name: mypy
-        entry: "sh build/hook_mypy_run.sh"
-        language: system
-        types: [python]
-        require_serial: true
-        pass_filenames: true
-
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v5.0.0
     hooks:
@@ -72,3 +61,15 @@ repos:
     rev: 0.8.4
     hooks:
       - id: uv-lock
+
+  # .pre-commit-config.yaml
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.11.2
+    hooks:
+      - id: mypy
+        pass_filenames: false
+        args:
+          - --config-file=pyproject.toml
+          - --explicit-package-bases
+          - src
+          - tests

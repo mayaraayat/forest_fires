@@ -16,7 +16,7 @@ coverage:
 	uv run pytest --cov=src --cov-report=term-missing
 
 precommit:
-	pre-commit run --all-files
+	uv run pre-commit run --all-files
 
 docs-serve:
 	uv run mkdocs serve
