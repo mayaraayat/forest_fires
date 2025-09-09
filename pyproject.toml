@@ -8,9 +8,12 @@ license = {text = "MIT"}
 dependencies = [
     "kagglehub>=0.3.13",
     "librosa>=0.11.0",
+    "lightning>=2.5.5",
     "matplotlib>=3.10.6",
+    "peft>=0.17.1",
     "torch>=2.8.0",
     "torchaudio>=2.8.0",
+    "transformers>=4.56.1",
 ]
 
 [tool.ruff]

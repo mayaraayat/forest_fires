@@ -7,6 +7,8 @@ import torch  # type: ignore
 import torchaudio  # type: ignore
 from torch.utils.data import DataLoader, Dataset  # type: ignore
 
+from src.forest_fires.utils.collate_fn import ast_collate_fn
+
 
 class AudioDataset(Dataset):  # type: ignore
     """Dataset for loading audio files, converting to mel spectrograms, and attaching labels."""
@@ -58,7 +60,8 @@ class AudioDataset(Dataset):  # type: ignore
 
         if sr != self.sample_rate:
             waveform = torchaudio.functional.resample(waveform, sr, self.sample_rate)
-
+        if waveform.shape[0] > 1:
+            waveform = torch.mean(waveform, dim=0, keepdim=True)  # convert to mono
         mel_spec = self.mel_transform(waveform)
         mel_db = self.db_transform(mel_spec)
 
@@ -77,6 +80,9 @@ def get_dataloader(
     batch_size: int = 16,
     shuffle: bool = True,
     num_workers: int = 0,
+    collate_fn: Callable[
+        [list[tuple[torch.Tensor, int]]], tuple[torch.Tensor, torch.Tensor]
+    ] = ast_collate_fn,
     **dataset_kwargs: Any,
 ) -> DataLoader:
     """Create DataLoader for all audio files in a directory.
@@ -88,6 +94,7 @@ def get_dataloader(
         batch_size: Number of samples per batch.
         shuffle: Whether to shuffle the dataset.
         num_workers: Number of worker processes for data loading.
+        collate_fn: Function to collate samples into a batch.
         **dataset_kwargs: Additional arguments to pass to the AudioDataset.
 
     Returns:
@@ -101,7 +108,13 @@ def get_dataloader(
     class_to_idx = {cls_name: idx for idx, cls_name in enumerate(classes)}
 
     dataset = AudioDataset(files, class_to_idx=class_to_idx, **dataset_kwargs)
-    return DataLoader(dataset, batch_size=batch_size, shuffle=shuffle, num_workers=num_workers)
+    return DataLoader(
+        dataset,
+        batch_size=batch_size,
+        shuffle=shuffle,
+        num_workers=num_workers,
+        collate_fn=collate_fn,
+    )
 
 
 # Example usage:
