@@ -93,6 +93,10 @@ class LoRaASTClassifier(pl.LightningModule):  # type: ignore
         """
         features, labels = batch
         features = features.to(self.device, dtype=torch.float16)
+        if torch.isnan(features).any() or torch.isinf(features).any():
+            self.log("nan_in_features", 1, prog_bar=True)
+        else:
+            self.log("nan_in_features", 0)
         outputs = self(features)
         loss = self.loss(outputs, labels)
         acc = (outputs.argmax(dim=-1) == labels).float().mean()
