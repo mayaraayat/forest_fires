@@ -65,6 +65,7 @@ class LoRaASTClassifier(pl.LightningModule):  # type: ignore
         self.ast_lora = build_ast_lora_model()
         hidden_size = self.ast_lora.config.hidden_size
         self.classifier = torch.nn.Linear(hidden_size, num_labels, dtype=torch.float16)
+        self.loss = torch.nn.CrossEntropyLoss()
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         """The forward method.
@@ -93,7 +94,7 @@ class LoRaASTClassifier(pl.LightningModule):  # type: ignore
         features, labels = batch
         features = features.to(self.device, dtype=torch.float16)
         outputs = self(features)
-        loss = torch.nn.CrossEntropyLoss()(outputs, labels)
+        loss = self.loss(outputs, labels)
         acc = (outputs.argmax(dim=-1) == labels).float().mean()
         self.log("train_loss", loss, on_step=True, on_epoch=True, prog_bar=True)
         self.log("train_acc", acc, on_step=True, on_epoch=True, prog_bar=True)
@@ -112,7 +113,7 @@ class LoRaASTClassifier(pl.LightningModule):  # type: ignore
         features, labels = batch
         features = features.to(self.device, dtype=torch.float16)
         outputs = self(features)
-        loss = torch.nn.functional.cross_entropy(outputs, labels)
+        loss = self.loss(outputs, labels)
         preds = outputs.argmax(dim=-1)
         acc = (preds == labels).float().mean()
         self.log("val_loss", loss, on_epoch=True, prog_bar=True)
