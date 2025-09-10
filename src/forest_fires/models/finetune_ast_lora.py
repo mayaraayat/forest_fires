@@ -24,9 +24,25 @@ def main(batch_size: int, lr: float = 1e-4, num_epochs: int = 20) -> None:
         "data/forest_fire_dataset/val", batch_size=batch_size, shuffle=False
     )
 
-    num_labels = len(train_loader.dataset.class_to_idx)
+    # Quick dataset sanity check
+    xb, yb = next(iter(train_loader))
+    print("Batch:", xb.shape, yb.shape)
+    print("nan?", torch.isnan(xb).any().item(), "inf?", torch.isinf(xb).any().item())
 
+    # ----------------- MODEL -----------------
+    num_labels = len(train_loader.dataset.class_to_idx)
     model = LoRaASTClassifier(num_labels=num_labels, lr=lr)
+
+    # Quick model forward check
+    with torch.no_grad():
+        out = model(xb)  # expect shape [B, num_labels]
+        print("Model output:", out.shape)
+        print("nan?", torch.isnan(out).any().item(), "inf?", torch.isinf(out).any().item())
+
+        # Quick loss check
+        criterion = torch.nn.CrossEntropyLoss()
+        loss = criterion(out, yb)
+        print("Loss sample:", loss.item())
 
     checkpoint_cb = ModelCheckpoint(
         dirpath="checkpoints",
