@@ -61,13 +61,6 @@ class LoRaASTClassifier(pl.LightningModule):  # type: ignore
         super().__init__()
         self.save_hyperparameters()
         self.ast_lora = build_ast_lora_model()
-        for p in self.ast_lora.base_model.parameters():
-            p.requires_grad = False
-        self.ast_lora.base_model.train()
-        n_trainable = sum(p.requires_grad for p in self.parameters())
-        print("Trainable params:", n_trainable)
-        print("AST backbone train mode:", self.ast_lora.base_model.training)
-
         hidden_size = self.ast_lora.config.hidden_size
         self.classifier = torch.nn.Linear(hidden_size, num_labels, dtype=torch.float32)
         self.loss = torch.nn.CrossEntropyLoss()
@@ -97,9 +90,12 @@ class LoRaASTClassifier(pl.LightningModule):  # type: ignore
             The training loss.
         """
         features, labels = batch
+        features = features.to(torch.float32)
         outputs = self(features)
-        loss = self.loss(outputs, labels)
-        acc = (outputs.argmax(dim=-1) == labels).float().mean()
+        logits = outputs if isinstance(outputs, torch.Tensor) else outputs.logits
+
+        loss = self.loss(logits.float(), labels)
+        acc = (logits.argmax(dim=-1) == labels).float().mean()
         self.log("train_loss", loss, on_step=True, on_epoch=True, prog_bar=True)
         self.log("train_acc", acc, on_step=True, on_epoch=True, prog_bar=True)
         return loss
@@ -115,9 +111,11 @@ class LoRaASTClassifier(pl.LightningModule):  # type: ignore
             The validation loss.
         """
         features, labels = batch
+        features = features.to(torch.float32)
         outputs = self(features)
-        loss = self.loss(outputs, labels)
-        preds = outputs.argmax(dim=-1)
+        logits = outputs if isinstance(outputs, torch.Tensor) else outputs.logits
+        loss = self.loss(logits.float(), labels)
+        preds = logits.argmax(dim=-1)
         acc = (preds == labels).float().mean()
         self.log("val_loss", loss, on_epoch=True, prog_bar=True)
         self.log("val_acc", acc, on_epoch=True, prog_bar=True)
