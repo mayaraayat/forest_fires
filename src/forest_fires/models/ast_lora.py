@@ -61,7 +61,13 @@ class LoRaASTClassifier(pl.LightningModule):  # type: ignore
         super().__init__()
         self.save_hyperparameters()
         self.ast_lora = build_ast_lora_model()
-        self.ast_lora.train()
+        for p in self.ast_lora.base_model.parameters():
+            p.requires_grad = False
+        self.ast_lora.base_model.train()
+        n_trainable = sum(p.requires_grad for p in self.parameters())
+        print("Trainable params:", n_trainable)
+        print("AST backbone train mode:", self.ast_lora.base_model.training)
+
         hidden_size = self.ast_lora.config.hidden_size
         self.classifier = torch.nn.Linear(hidden_size, num_labels, dtype=torch.float32)
         self.loss = torch.nn.CrossEntropyLoss()
