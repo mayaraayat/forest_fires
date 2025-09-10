@@ -34,7 +34,6 @@ def build_ast_lora_model(
     base_model = ASTModel.from_pretrained(
         pretrained_model,
         attn_implementation="sdpa",
-        dtype=dtype,
     )
 
     lora_config = LoraConfig(
@@ -64,7 +63,7 @@ class LoRaASTClassifier(pl.LightningModule):  # type: ignore
         self.save_hyperparameters()
         self.ast_lora = build_ast_lora_model()
         hidden_size = self.ast_lora.config.hidden_size
-        self.classifier = torch.nn.Linear(hidden_size, num_labels, dtype=torch.float16)
+        self.classifier = torch.nn.Linear(hidden_size, num_labels)
         self.loss = torch.nn.CrossEntropyLoss()
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
@@ -76,7 +75,7 @@ class LoRaASTClassifier(pl.LightningModule):  # type: ignore
         Returns:
             Logits tensor of shape (batch_size, num_labels).
         """
-        outputs = self.ast_lora(input_values=x.to(torch.float16))
+        outputs = self.ast_lora(input_values=x)
         cls_emb = outputs.last_hidden_state[:, 0, :]  # [batch, hidden_dim]
         logits = self.classifier(cls_emb)
         return logits
@@ -110,7 +109,6 @@ class LoRaASTClassifier(pl.LightningModule):  # type: ignore
             The validation loss.
         """
         features, labels = batch
-        features = features.to(self.device, dtype=torch.float16)
         outputs = self(features)
         loss = self.loss(outputs, labels)
         preds = outputs.argmax(dim=-1)
