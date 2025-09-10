@@ -41,7 +41,6 @@ def build_ast_lora_model(
         target_modules=["query", "value"],
         lora_dropout=dropout,
         bias="none",
-        task_type="SEQ_CLS",
     )
 
     model = get_peft_model(base_model, lora_config)
