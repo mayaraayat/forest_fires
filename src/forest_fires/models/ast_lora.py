@@ -17,7 +17,6 @@ def build_ast_lora_model(
     r: int = 8,
     alpha: int = 16,
     dropout: float = 0.1,
-    dtype: torch.dtype = torch.float16,
 ) -> ASTModel:
     """Build an AST model with LoRA adapters for classification.
 
@@ -26,7 +25,6 @@ def build_ast_lora_model(
         r: Rank of the LoRA update matrices.
         alpha: Scaling factor for LoRA layers.
         dropout: Dropout probability on LoRA layers.
-        dtype: Torch dtype for model weights.
 
     Returns:
         ASTForAudioClassification model wrapped with LoRA adapters.
@@ -34,6 +32,7 @@ def build_ast_lora_model(
     base_model = ASTModel.from_pretrained(
         pretrained_model,
         attn_implementation="sdpa",
+        dtype=torch.float32,
     )
 
     lora_config = LoraConfig(
@@ -62,8 +61,9 @@ class LoRaASTClassifier(pl.LightningModule):  # type: ignore
         super().__init__()
         self.save_hyperparameters()
         self.ast_lora = build_ast_lora_model()
+        self.ast_lora.train()
         hidden_size = self.ast_lora.config.hidden_size
-        self.classifier = torch.nn.Linear(hidden_size, num_labels)
+        self.classifier = torch.nn.Linear(hidden_size, num_labels, dtype=torch.float32)
         self.loss = torch.nn.CrossEntropyLoss()
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
