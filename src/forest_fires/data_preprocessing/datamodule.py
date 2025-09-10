@@ -63,8 +63,11 @@ class AudioDataset(Dataset):  # type: ignore
         if waveform.shape[0] > 1:
             waveform = torch.mean(waveform, dim=0, keepdim=True)  # convert to mono
         mel_spec = self.mel_transform(waveform)
+        mel_spec = torch.clamp(mel_spec, min=1e-10)
         mel_db = self.db_transform(mel_spec)
 
+        # Normalize
+        mel_db = (mel_db - mel_db.mean()) / (mel_db.std() + 1e-6)
         if self.transform:
             mel_db = self.transform(mel_db)
 
