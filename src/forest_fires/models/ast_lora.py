@@ -93,7 +93,7 @@ class LoRaASTClassifier(pl.LightningModule):  # type: ignore
         features, labels = batch
         features = features.to(self.device, dtype=torch.float16)
         outputs = self(features)
-        loss = torch.nn.functional.cross_entropy(outputs, labels)
+        loss = torch.nn.BCE()(outputs, labels)
         acc = (outputs.argmax(dim=-1) == labels).float().mean()
         self.log("train_loss", loss, on_step=True, on_epoch=True, prog_bar=True)
         self.log("train_acc", acc, on_step=True, on_epoch=True, prog_bar=True)
