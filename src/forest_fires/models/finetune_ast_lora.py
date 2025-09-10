@@ -8,11 +8,14 @@ from src.forest_fires.data_preprocessing.datamodule import get_dataloader
 from src.forest_fires.models.ast_lora import LoRaASTClassifier
 
 
-def main() -> None:
-    """Main training function."""
+def main(batch_size: int, lr: float = 1e-4) -> None:
+    """Main training function.
+
+    Args:
+        batch_size: Batch size for training and validation.
+        lr: Learning rate for the optimizer.
+    """
     seed_everything(42)
-    batch_size = 2
-    # Build dataloaders
     train_loader = get_dataloader(
         "data/forest_fire_dataset/train", batch_size=batch_size, shuffle=True
     )
@@ -20,13 +23,10 @@ def main() -> None:
         "data/forest_fire_dataset/val", batch_size=batch_size, shuffle=False
     )
 
-    # Detect number of classes from dataset
     num_labels = len(train_loader.dataset.class_to_idx)
 
-    # Model
-    model = LoRaASTClassifier(num_labels=num_labels, lr=1e-4)
+    model = LoRaASTClassifier(num_labels=num_labels, lr=lr)
 
-    # Callbacks
     checkpoint_cb = ModelCheckpoint(
         dirpath="checkpoints",
         filename="ast-lora-{epoch:02d}-{val_acc:.2f}",
@@ -40,7 +40,6 @@ def main() -> None:
         patience=5,
     )
 
-    # Trainer
     trainer = Trainer(
         accelerator="gpu" if torch.cuda.is_available() else "cpu",
         devices=1,
@@ -55,4 +54,4 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    main()
+    main(batch_size=2)
