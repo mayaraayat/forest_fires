@@ -1,10 +1,10 @@
 """Training script for ASTLightning with LoRA adapters."""
 
-import torch  # type: ignore
-from lightning.pytorch import Trainer, seed_everything  # type: ignore
-from lightning.pytorch.callbacks import EarlyStopping, ModelCheckpoint  # type: ignore
+import torch
+from lightning.pytorch import Trainer, seed_everything
+from lightning.pytorch.callbacks import EarlyStopping, ModelCheckpoint
 
-from src.forest_fires.data_preprocessing.datamodule import get_dataloader
+from forest_fires.data_preprocessing.ast_lora_datamodule import get_dataloader
 from src.forest_fires.models.ast_lora import LoRaASTClassifier
 
 

@@ -7,13 +7,15 @@ requires-python = ">=3.10"
 license = {text = "MIT"}
 dependencies = [
     "kagglehub>=0.3.13",
-    "librosa>=0.11.0",
     "lightning>=2.5.5",
     "matplotlib>=3.10.6",
-    "peft>=0.17.1",
+    "numpy>=2.2.6",
+    "pytorch-lightning>=2.5.5",
+    "seaborn>=0.13.2",
+    "soundfile>=0.13.1",
     "torch>=2.8.0",
     "torchaudio>=2.8.0",
-    "transformers>=4.56.1",
+    "transformers[torch]>=4.56.1",
 ]
 
 [tool.ruff]
@@ -31,7 +33,7 @@ convention = "google"
 python_version = "3.10"
 explicit_package_bases = true
 strict = true
-ignore_missing_imports = false
+ignore_missing_imports = true
 disallow_untyped_defs = true
 check_untyped_defs = true
 

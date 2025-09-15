@@ -2,7 +2,7 @@
 
 from typing import Any
 
-import torch  # type: ignore
+import torch
 
 
 def ast_collate_fn(batch: Any, max_frames: int = 1024) -> tuple[torch.Tensor, torch.Tensor]:

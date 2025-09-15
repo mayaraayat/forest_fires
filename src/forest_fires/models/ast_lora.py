@@ -2,10 +2,10 @@
 
 from typing import Any
 
-import lightning.pytorch as pl  # type: ignore
-import torch  # type: ignore
-from peft import LoraConfig, get_peft_model  # type: ignore
-from transformers import ASTModel  # type: ignore
+import lightning.pytorch as pl
+import torch
+from peft import LoraConfig, get_peft_model
+from transformers import ASTModel
 
 from src.forest_fires.utils.log import get_logger
 

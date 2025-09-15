@@ -3,9 +3,9 @@
 from pathlib import Path
 from typing import Any, Callable
 
-import torch  # type: ignore
-import torchaudio  # type: ignore
-from torch.utils.data import DataLoader, Dataset  # type: ignore
+import torch
+import torchaudio
+from torch.utils.data import DataLoader, Dataset
 
 from src.forest_fires.utils.collate_fn import ast_collate_fn
 

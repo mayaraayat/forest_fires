@@ -1,1 +1,1 @@
-"""Initialization module for the data preprocessing package."""
+"""Data preprocessing package."""
