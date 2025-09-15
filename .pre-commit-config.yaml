@@ -71,4 +71,3 @@ repos:
           - --config-file=pyproject.toml
           - --explicit-package-bases
           - src
-          - tests
