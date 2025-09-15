@@ -12,5 +12,6 @@ build/
 htmlcov/
 .DS_Store
 .vscode/
-data/
+**/data/
 site/
+notebooks/

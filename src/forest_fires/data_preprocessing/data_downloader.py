@@ -1,3 +1,13 @@
+"""
+This module provides utility functions to download and organize audio datasets
+for the forest fire classification. 
+
+Directory structure created:
+    data/forest_fire_dataset/
+        ├── class_0/   # ESC-50 .wav files
+        └── class_1/   # Forest Fire dataset .wav files
+
+"""
 import shutil
 import requests, zipfile, os
 from pathlib import Path
